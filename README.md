@@ -86,4 +86,113 @@ submit버튼을 눌렀을때 액션속성이 가리키는 서버로 queryString�
 하지만 파일에 데이터를 쓰거나, 수정하거나, 삭제하는 행위를 할때는 필요한 데이터를 url로 보내면 안됨, 눈에 보이지 않는 방식으로 보내는
 post방식을 사용해야함. -> form에 method="post" -> 이렇게하면 아주 큰 데이터를 보낼수도 있음(get으로 하면 큰 데이터 못보냄)
 
+createServer(function(request, response) 이 콜백함수를 nodejs가 호출함
+여기엔 request, response 인자 두개를 주는데
+request는 요청할때 웹브라우저가 보낸 정보를 담은것이고
+response는 응답할때 웹서버가 웹브라우저에 전송할 정보를 담는것임
 
+request.on 데이터 : 웹브라우저가 post방식으로 데이터를 전달할때  데이터가 엄청 많으면 그 데이터를 한번에 처리하지 못함
+그래서 nodejs에서 post로 전송되는 데이터가 많을 경우를 대비해서 사용하는 것, 
+콜백함수로 데이터의 양을 나눠서 서버가 수신할때 마다 콜백함수를 호출하면서 데이터라는 인자로 수신한 정보를 주기로 함.
+
+qs : node.js가 가지고있는 querystring이라는 모듈임
+qs.parse();로 이전에 받았던 데이터 string을 객체로 만들수 있음
+
+즉, post방식으로 받은 데이터를 실제로 사용할 수 있게 구현하는 단계는 이렇다.
+let body = "";
+    request.on("data", (data) => {
+      body = body + data;
+    });
+    request.on("end", () => {
+      let post = qs.parse(body);
+      let title = post.title;
+      let description = post.description;
+    });
+
+Node.js-33.App 제작-파일생성과 리다이렉션
+post방식으로 전송된 데이터를 데이터 디렉토리안에 파일의 형태로 저장하는 법을 탐구한다.
+fs.writeFile로 파일을 새로 작성한다. 형식은 fs.writeFile(`경로/파일이름`, 파일내용, "utf8", 콜백함수(err){
+여기에 파일을 저장하고나서 저장한 파일을 볼 수 있는 페이지로 이동해야하는데 redirect로 구현한다. 
+response.writeHead(302, {Location: `원하는 파일 queryString`}을 해주면 된다. 302가 redirect해주는 부분이다. 전에 사용한 200은 성공 여부를 알려주는 것이었다.
+});
+
+Node.js-34.App 제작-글수정-수정링크생성
+업데이트 링크를 pathname이 queryString일 때만(홈페이지가 아닐때에만) 나오게끔 설정해줌
+
+Node.js-35.App 제작-글수정-수정할 정보 전송
+내용을 수정해줄 수 있게 form으로 내용들을 불러오기위해 readFile을 하고 input이랑 textarea에 읽어온 파일의 내용들을 넣어줌.
+그리고 이전에 파일 명을 찾아갈 수 있도록 input폼을 하나 더 만들어서 히든으로 만들고 value에 기존 title을 넣어줌
+
+Node.js-36.App 제작-글수정-파일명 변경, 내용저장
+update에서 submit 했을때 진행할 페이지 /update_process를 만들어줌
+경로 /update_process를 따로 만들어주고 거기선 post방식으로 받은 데이터를 저장하게끔 해야함
+그리고 파일명을 바꾸는 경우도 있으니 fs.rename(oldpath, newpath, callback)함수를 써준다.
+그리고 fs.writeFile로 받아온 데이터를 새로 저장해준다.
+
+Node.js-37.App 제작-글삭제-삭제버튼 구현
+update옆에 버튼만 구현해주었음 삭제는 링크로 보내면 안되기 때문에 form으로 submit value="delete"버튼을 만들고 
+template에 추가해줬음 form action은 delete_process, method는 post로 설정해줌
+
+Node.js-38.App 제작-글삭제 기능 완성
+/delete_process에서 작동할 기능을 구현함
+id값을 받아와서 바로 삭제하는 기능
+post에서 값을 받아와서 fs.unlink(데이터경로, 콜백)함
+끝나고 그냥 홈페이지로 보내버림 끝
+
+Node.js-41.JavaScript-객체-값으로서 함수
+let f = function(){
+console.log(1+1);
+console.log(1+2);
+}
+let a = [f];
+a[0](); 
+이렇게 배열로 함수 사용 가능
+let o = {
+func:F
+}
+o.func();
+이렇게 객체의 프로퍼티로 함수 사용가능 
+즉, 함수는 값이기도 함.
+
+Node.js-42.JavaScript-객체-데이터와 처리 방법을 담는 그릇으로서 객체
+함수내에서 프로퍼티나 함수를 부르고 싶을땐 this를 사용.
+
+Node.js-44.Node.js 모듈의형식
+객체가 많아지면 정리하는것 : 모듈(가장 큰 도구, 틀)
+모듈을 이용하면 객체등을 파일로 쪼개서 외부로 독립시킬수 있음
+let M = {
+  v: "v",
+  f: function () {
+    console.log(this.v);
+  },
+};
+module.exports = M : 모듈이 담겨있는 파일에 있는 여러 기능들중 M이 가리키는 객체를 모듈 밖에서 사용할 수 있도록 exports하는것
+외부 다른 파일에서 let part = require('./모듈이 있는 파일') 
+part.f();하면 사용가능
+
+Node.js-45.App 제작 - 모듈의 활용
+main.js에 쓰였던 template를 따로 파일에 담아서 저장후 main.js에서 require해서 사용
+
+Node.js-46.App 제작-입력정보에 대한 보안
+오염된 정보가 들어와서 파일에 접근하는 코드를 건드리면 파일에 담긴 정보나 그 상위 파일들에 대한 정보들도 나올수 있음
+그렇기에 연결고리를 끊어줘야함 -> 경로를 달리해줘야함.
+path.parse().base를 이용하여 파일 하나만을 가리킬 수 있음.
+
+Node.js-47.1.App제작-출력정보에 대한 보안
+사용자가 입력한 오염된 정보 중 오염된 정보가 나가서 사용자에게 피해를 끼칠수 있음
+html 스크립트를 만들수 있으니 <>를 바꿔줘서 기능을 비활성화 시킬수 있음
+
+Node.js-47.2.App제작-출력정보에 대한 보안
+npm-sanitize-html 을 사용할것
+npm : 애플리케이션을 npm으로 관리하게됨
+npm init으로 패키지를 만들고
+npm install -S sanitize-html 으로 sanitize-html을 설치해줌
+package.json의 dependencies를 보면 sanitize-html가 있는데
+이 파일은 sanitize-html에 의존한다는 것임.
+
+Node.js-47.3.App제작-출력정보에 대한 보안
+main.js에서 sanitize-html을 require해줌
+그리고 제목이나 내용등에 sanitize해줌
+let sanitizedTitle = sanitizeHtml(title);
+let sanitizedData = sanitizeHtml(data);
+이런식으로 이렇게하면 사용자가 글을 작성할 때 태그를 허용 안시켜줌
