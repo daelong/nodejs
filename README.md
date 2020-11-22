@@ -196,3 +196,20 @@ main.js에서 sanitize-html을 require해줌
 let sanitizedTitle = sanitizeHtml(title);
 let sanitizedData = sanitizeHtml(data);
 이런식으로 이렇게하면 사용자가 글을 작성할 때 태그를 허용 안시켜줌
+
+Node.js-48. API와 CreateServer
+함수를 만든 개발자들과 그걸 사용하는 사용자들과의 약속 : interface
+API(Application Programming Interface) : 애플리케이션을 프로그래밍하기 위해 제공되는 인터페이스 
+
+API만 알면 기능 다 쓸수 있음
+nodejs가 가진 기본적인 모듈들 공부, npm과같은 패키지 매니저를 이용해서 다운받아서 사용할 수 있는 모듈들이 뭐가 있는지 공부
+nodejs awesome (노드말고도 검색해서 찾아보기) 찾아봐서 주목받는 모듈들을 사용하기
+database : mongoDB공부
+framework : 공통적인 부분(사용자 요청 처리, 인증, 보완, 파일 서비스)을 미리 구현해 놓은것
+
+Node.js-49.부록 - pm2 보충학습
+pm2 list : 현재 프로세스들 리스트
+pm2 kill : 현재 켜진 프로세스들 다 끔
+pm2 start main.js --watch --no-daemon : daemon아니게 실행, log까지 볼 수 있음
+daemon : 백그라운드로 실행되는 프로그램들
+pm2 start main.js --watch --ignore-watch="data/*" --no-daemon : --ignore-watch="data/*" 이것은 데이터 디렉토리의 모든 파일들에 대해서 watch하는걸 무시한다고 하는것임
