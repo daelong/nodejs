@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/daelong/nodejs#readme",
   "dependencies": {
+    "mongoose": "^5.10.15",
     "sanitize-html": "^2.1.2"
   }
 }
