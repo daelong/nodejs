@@ -8,8 +8,11 @@ let path = require("path");
 let sanitizeHtml = require("sanitize-html");
 
 let app = http.createServer(function (request, response) {
+  //
   let _url = request.url; // 여기에 query string값이 들어감
+  console.log(_url);
   let queryData = url.parse(_url, true).query; //queryData에 담긴 데이터는 객체이고
+  console.log(queryData);
   let title = queryData.id;
   let pathName = url.parse(_url, true).pathname;
   if (pathName === "/") {
